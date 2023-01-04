@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Magic tickets</title>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Home page of Magic tickets" />
+    <meta name="author" content="Riccardo Brigatti" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="date" content="2022-11-19" />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+
+  <body>
+    <header>
+      Magic Ticket
+      <h2>Create a new ticket</h2>
+    </header>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#">Create new ticket</a>
+      <a href="ticket1Details.html">Ticket details</a>
+    </nav>
+    <main>
+      <section>
+        <form
+          action="https://supsi-ticket.cloudns.in/brigatti/tickets"
+          method="post"
+        >
+          <fieldset>
+            <legend>Details</legend>
+            <label for="title">Title:</label><br />
+            <input type="text" id="title" name="title" /><br />
+            <label for="author">Author:</label><br />
+            <input
+              type="text"
+              id="author"
+              name="author"
+              value="user1"
+              readonly
+            /><br />
+            <label for="date">Date:</label><br />
+            <input
+              type="date"
+              id="date"
+              name="creationDate"
+              value="2022-11-20"
+              readonly
+            /><br />
+            <label for="state">Sate:</label><br />
+            <select id="state" name="state">
+              <option value="aa">aa</option>
+              <option value="bb">bb</option>
+              <option value="cc">cc</option>
+              <option value="dd">dd</option></select
+            ><br />
+            <label for="description">Description:</label><br />
+            <textarea
+              id="description"
+              name="description"
+              placeholder="Insert ticket description..."
+              rows="4"
+              cols="50"
+            ></textarea
+            ><br />
+          </fieldset>
+          <input type="submit" value="Create" />
+        </form>
+      </section>
+    </main>
+    <aside><h3>Side bar</h3></aside>
+    <footer>
+      <p>
+        <a
+          href="https://www.supsi.ch/dti/bachelor/ingegneria-informatica/piano-studio-offerta-formativa/offerta-formativa/dettaglio-offerta-formativa/dettaglio-modulo.160466.backLink.9ad4a42f-cc38-46b5-a0fb-3d53e60bfe53&of=541.html"
+          >Web 1</a
+        >
+        — <a href="https://supsi.ch">SUPSI</a> —
+      </p>
+      <small>Copyright © 2022 Riccardo Brigatti</small>
+    </footer>
+  </body>
+</html>

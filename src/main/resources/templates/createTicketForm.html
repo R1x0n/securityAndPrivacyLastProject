@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<div th:replace="fragments/header :: header"></div>
+
+<body>
+<div class="container-fluid position-relative d-flex p-0">
+    <!-- Spinner Start -->
+    <div id="spinner"
+         class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Sidebar Start -->
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+    <!-- Sidebar End -->
+
+
+    <!-- Content Start -->
+    <div class="content">
+        <!-- Navbar Start -->
+        <div th:replace="fragments/navbar :: navbar"></div>
+        <!-- Navbar End -->
+
+        <!-- Main content -->
+        <div class="container-fluid pt-4 px-4 d-flex justify-content-center bd-highlight mb-3">
+            <div class="col-sm-12 col-xl-6">
+                <div class="bg-secondary rounded h-100 p-4">
+                    <h6 class="mb-4">Create new ticket</h6>
+                    <form
+                            th:action="@{/ticket/new}"
+                            method="post"
+                            enctype="multipart/form-data">
+                        <fieldset>
+                            <legend>Details</legend>
+                            <label for="title" class="form-label">Title:</label><br/>
+                            <input type="text" id="title" name="title" class="form-control"/><br/>
+                            <label for="level" class="form-label">Level:</label><br/>
+                            <select name="level" id="level" class="form-select form-select-lg mb-3">
+                                <option th:each="status : ${T(ch.supsi.webapp.web.Enum.Level).values()}"
+                                        th:value="${status}" th:text="${status}"></option>
+                            </select>
+                            <br/>
+                            <label for="description" class="form-label">Description:</label><br/>
+                            <textarea
+                                    id="description"
+                                    name="description"
+                                    placeholder="Insert ticket description..."
+                                    rows="4"
+                                    cols="50"
+                                    class="form-control"></textarea
+                            ><br/>
+                            <input class="form-control form-control-sm bg-dark" id="file" type="file" name="file" />
+                        </fieldset><br>
+                        <input type="submit" value="Create" class="btn btn-primary"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Main content end -->
+
+        <!-- Footer Start -->
+        <div th:replace="fragments/footer :: footer"></div>
+        <!-- Footer End -->
+    </div>
+    <!-- Content End -->
+
+</div>
+<div th:replace="fragments/js :: js"></div>
+
+</body>
+
+</html>

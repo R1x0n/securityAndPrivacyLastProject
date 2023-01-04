@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Magic tickets</title>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Home page of Magic tickets" />
+    <meta name="author" content="Riccardo Brigatti" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="date" content="2022-11-19" />
+    <link rel="stylesheet" th:href="@{/css/style.old.css}"/>
+  </head>
+
+  <body>
+    <header>
+      Magic Ticket
+      <h2>Ticket details</h2>
+    </header>
+
+    <nav>
+      <a th:href="@{/}">Home</a>
+      <a th:href="@{/ticket/new}">Create new ticket</a>
+    </nav>
+    <main>
+      <section>
+        <h2 th:text="'Ticket '+${ticket.id}">Ticket 1</h2>
+        <article>
+          <h3 th:text="${ticket.title}">Title</h3>
+          <p th:text="${ticket.description}">Description</p>
+          <a th:href="@{/ticket/{id}/edit(id=${ticket.id})}">Edit</a>
+            <a th:href="@{/ticket/{id}/delete(id=${ticket.id})}">Delete</a>
+        </article>
+      </section>
+    </main>
+    <aside><h3>Side bar</h3></aside>
+    <footer>
+      <p>
+        <a
+          href="https://www.supsi.ch/dti/bachelor/ingegneria-informatica/piano-studio-offerta-formativa/offerta-formativa/dettaglio-offerta-formativa/dettaglio-modulo.160466.backLink.9ad4a42f-cc38-46b5-a0fb-3d53e60bfe53&of=541.html"
+          >Web 1</a
+        >
+        — <a href="https://supsi.ch">SUPSI</a> —
+      </p>
+      <small>Copyright © 2022 Riccardo Brigatti</small>
+    </footer>
+  </body>
+</html>
