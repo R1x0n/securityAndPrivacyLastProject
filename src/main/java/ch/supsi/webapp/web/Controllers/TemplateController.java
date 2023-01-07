@@ -1,13 +1,18 @@
 package ch.supsi.webapp.web.Controllers;
 
 import ch.supsi.webapp.web.Config.JwtUserDetailsService;
+import ch.supsi.webapp.web.Interfaces.ICustomer;
 import ch.supsi.webapp.web.Modules.Employee;
+import ch.supsi.webapp.web.Repositories.CustomerRepository;
 import ch.supsi.webapp.web.Repositories.RoleRepository;
 import ch.supsi.webapp.web.Services.ServiceUser;
 import ch.supsi.webapp.web.Utilities.JwtRequestModel;
 import ch.supsi.webapp.web.Utilities.JwtResponseModel;
 import ch.supsi.webapp.web.Utilities.TokenManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -25,7 +30,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Controller
 public class TemplateController {
@@ -37,7 +45,7 @@ public class TemplateController {
     @Autowired
     private TokenManager tokenManager;
 
-    @PostMapping("/login2")
+    @PostMapping("/app/login2")
     public ResponseEntity createToken(@RequestBody JwtRequestModel
                                               request) throws Exception {
         request.setUsername(java.net.URLDecoder.decode(request.getUsername(), StandardCharsets.UTF_8));
@@ -64,6 +72,8 @@ public class TemplateController {
     private ServiceUser serviceUser;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     private Employee getUser(Object principal) {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
@@ -75,14 +85,38 @@ public class TemplateController {
         return user;
     }
 
+    @Controller
+    public class MyErrorController implements ErrorController {
+
+        @RequestMapping("/error")
+        public String handleError(Model model, HttpServletRequest request) {
+            model.addAttribute("error", request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE));
+            return "error";
+        }
+    }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String homeRedirect(Model model) {
+        return "redirect:/app";
+    }
+
+    @RequestMapping(value = "/app/allCustomers", method = RequestMethod.GET)
     public String home(Model model) {
+        List<ICustomer> customers = customerRepository.getCustomersInterface();
+        model.addAttribute("customers", customerRepository.getCustomersInterface());
+        model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+        return "allCustomers";
+    }
+
+    @RequestMapping(value = "/app", method = RequestMethod.GET)
+    public String personalCustomers(Model model) {
+        List<ICustomer> customers = customerRepository.getPersonalCustomersInterface(getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmployeeId());
+        model.addAttribute("customers", customers);
         model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
         return "index";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/login", method = RequestMethod.GET)
     public String login(Model model) {
         return "login";
     }
@@ -92,20 +126,57 @@ public class TemplateController {
         return "createTicketForm";
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    @RequestMapping(value = "/app/changePassword", method = RequestMethod.GET)
     public String register(Model model) {
-        return "register";
+        model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+        return "changePassword";
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public String registerPost(Employee user, @RequestParam("password2") String password2) {
-        if (serviceUser.findUserByUsername(user.getUsername()) == null && user.getPassword().equals(password2)) {
-            user.setRole(roleRepository.findById(2).get());
-            user.setPassword(encoder.encode(user.getPassword()));
-            serviceUser.save(user);
-            return "redirect:/login";
+    @RequestMapping(value = "/app/changePassword", method = RequestMethod.POST)
+    public String registerPost(@RequestParam("current") String current, @RequestParam("new") String newPass, @RequestParam("confirm") String confirm, Model model) {
+        Employee user = getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        String password = user.getPassword();
+        if (current.equals(newPass)) {
+            model.addAttribute("error", "The new password must be different from the current one");
+            model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+            return "changePassword";
         }
-        return "register";
+        if (validatePassword(newPass)) {
+            if (newPass.equals(confirm)) {
+                if (encoder.matches(current, password)) {
+                    user.setPassword(encoder.encode(newPass));
+                    serviceUser.save(user);
+                    return "redirect:/app/profile";
+                } else {
+                    model.addAttribute("error", "Current password is not correct");
+                    model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+                    return "changePassword";
+                }
+            } else {
+                model.addAttribute("error", "New password and confirm password are not the same");
+                model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+                return "changePassword";
+            }
+        } else {
+            model.addAttribute("error", "Password must be at least 8 characters long and contain at least one digit, one uppercase letter and one lowercase letter");
+            model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+            return "changePassword";
+        }
+    }
+
+    //Method to validate the password complexity
+    private boolean validatePassword(String password) {
+        boolean hasUppercase = !password.equals(password.toLowerCase());
+        boolean hasLowercase = !password.equals(password.toUpperCase());
+        boolean hasNumber = password.matches(".*\\d.*");
+        return hasUppercase && hasLowercase && hasNumber && password.length() >= 8;
+    }
+
+
+    @RequestMapping(value = "/app/profile", method = RequestMethod.GET)
+    public String profile(Model model) {
+        model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
+        return "profile";
     }
 
 

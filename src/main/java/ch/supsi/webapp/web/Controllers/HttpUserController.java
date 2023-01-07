@@ -21,7 +21,7 @@ public class HttpUserController {
     @Autowired
     private ServiceUser serviceUser;
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/users", method = RequestMethod.GET)
     public List<Employee> get() {
         return (List<Employee>) serviceUser.findAll();
     }

@@ -1,6 +1,6 @@
 <div th:fragment="sidebar" class="sidebar pe-4 pb-3" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <nav class="navbar bg-secondary navbar-dark">
-        <a th:href="@{/}" class="navbar-brand mx-4 mb-3">
+        <a th:href="@{/app}" class="navbar-brand mx-4 mb-3">
             <h3 class="text-primary">Dark Ticket</h3>
         </a>
         <div class="d-flex align-items-center ms-4 mb-4">
@@ -9,14 +9,14 @@
                 <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
             </div>
             <div class="ms-3">
-                <h6 class="mb-0" th:text="${user.email}">Anonymous</h6>
+                <h6 class="mb-0" th:text="${#strings.substringBefore(user.email,'@')}">Anonymous</h6>
                 <span th:if="${user.role} != null" th:text="${user.role}">Guest</span>
                 <span th:if="${user.role} == null">Guest</span>
             </div>
         </div>
         <div class="navbar-nav w-100">
-            <a th:href="@{/}" class="nav-item nav-link"><i class="fas fa-ticket-alt me-2"></i>Tickets</a>
-            <a th:href="@{/ticket/new}" class="nav-item nav-link"><i class="fas fa-plus-square me-2"></i>New</a>
+            <a th:href="@{/app}" class="nav-item nav-link"><i class="fas fa-ticket-alt me-2"></i>Your Costumers</a>
+            <a th:href="@{/app/allCustomers}" class="nav-item nav-link" th:if="${#authorization.expression('hasRole(''ROLE_MANAGER'')')}"><i class="fas fa-plus-square me-2"></i>All Costumers</a>
         </div>
     </nav>
 </div>
