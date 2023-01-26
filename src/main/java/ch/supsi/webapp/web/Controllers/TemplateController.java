@@ -3,16 +3,15 @@ package ch.supsi.webapp.web.Controllers;
 import ch.supsi.webapp.web.Config.JwtUserDetailsService;
 import ch.supsi.webapp.web.Interfaces.ICustomer;
 import ch.supsi.webapp.web.Modules.Employee;
-import ch.supsi.webapp.web.Repositories.CustomerRepository;
-import ch.supsi.webapp.web.Repositories.RoleRepository;
+import ch.supsi.webapp.web.Repositories.CostumerRepository;
+import ch.supsi.webapp.web.Repositories.LogsRepository;
 import ch.supsi.webapp.web.Services.ServiceUser;
 import ch.supsi.webapp.web.Utilities.JwtRequestModel;
 import ch.supsi.webapp.web.Utilities.JwtResponseModel;
+import ch.supsi.webapp.web.Utilities.UtilLogger;
 import ch.supsi.webapp.web.Utilities.TokenManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -32,7 +31,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
 
 @Controller
@@ -45,7 +46,10 @@ public class TemplateController {
     @Autowired
     private TokenManager tokenManager;
 
-    @PostMapping("/app/login2")
+    @Autowired
+    private LogsRepository logsRepository;
+
+    @PostMapping("/api/login")
     public ResponseEntity createToken(@RequestBody JwtRequestModel
                                               request) throws Exception {
         request.setUsername(java.net.URLDecoder.decode(request.getUsername(), StandardCharsets.UTF_8));
@@ -67,13 +71,11 @@ public class TemplateController {
     }
 
 
-    private PasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
     @Autowired
     private ServiceUser serviceUser;
     @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
+    private CostumerRepository costumerRepository;
 
     private Employee getUser(Object principal) {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
@@ -102,22 +104,24 @@ public class TemplateController {
 
     @RequestMapping(value = "/app/allCustomers", method = RequestMethod.GET)
     public String home(Model model) {
-        List<ICustomer> customers = customerRepository.getCustomersInterface();
-        model.addAttribute("customers", customerRepository.getCustomersInterface());
+        List<ICustomer> customers = costumerRepository.getCustomersInterface();
+        model.addAttribute("customers", costumerRepository.getCustomersInterface());
         model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
         return "allCustomers";
     }
 
     @RequestMapping(value = "/app", method = RequestMethod.GET)
     public String personalCustomers(Model model) {
-        List<ICustomer> customers = customerRepository.getPersonalCustomersInterface(getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmployeeId());
+        List<ICustomer> customers = costumerRepository.getPersonalCustomersInterface(getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmployeeId());
         model.addAttribute("customers", customers);
         model.addAttribute("user", getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
         return "index";
     }
 
     @RequestMapping(value = "/app/login", method = RequestMethod.GET)
-    public String login(Model model) {
+    public String login(Model model) throws SQLException, IOException {
+        UtilLogger logger = new UtilLogger(logsRepository);
+        logger.info("Login page",getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmployeeId());
         return "login";
     }
 
@@ -133,7 +137,7 @@ public class TemplateController {
     }
 
     @RequestMapping(value = "/app/changePassword", method = RequestMethod.POST)
-    public String registerPost(@RequestParam("current") String current, @RequestParam("new") String newPass, @RequestParam("confirm") String confirm, Model model) {
+    public String registerPost(@RequestParam("current") String current, @RequestParam("new") String newPass, @RequestParam("confirm") String confirm, Model model) throws SQLException, IOException {
         Employee user = getUser(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         String password = user.getPassword();
         if (current.equals(newPass)) {
@@ -146,6 +150,7 @@ public class TemplateController {
                 if (encoder.matches(current, password)) {
                     user.setPassword(encoder.encode(newPass));
                     serviceUser.save(user);
+                    //Log4j.getInstance().getLogger().info("User " + user.getUsername() + " changed password");
                     return "redirect:/app/profile";
                 } else {
                     model.addAttribute("error", "Current password is not correct");

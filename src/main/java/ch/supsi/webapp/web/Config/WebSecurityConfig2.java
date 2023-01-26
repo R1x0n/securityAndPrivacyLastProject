@@ -5,19 +5,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @Order(2)
@@ -36,13 +32,12 @@ public class WebSecurityConfig2 {
 
     @Bean
     public SecurityFilterChain securityFilterChain2(HttpSecurity http) throws Exception {
-        http.antMatcher("/api/**")
-                .authorizeRequests().anyRequest().hasRole("MANAGER")
-                .and()
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+       http.authorizeRequests()
+               .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/costumers/all").hasRole("NORMAL")
+                .antMatchers("/api/**").authenticated();
+        http.csrf().disable();
+
         return http.build();
     }
 
@@ -53,13 +48,6 @@ public class WebSecurityConfig2 {
         authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
         return authProvider;
     }
-   // @Bean
-   // public DaoAuthenticationProvider jwtAuthProvider2() {
-   //     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-   //     authProvider.setUserDetailsService(jwtUserDetailsService);
-   //     authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
-   //     return authProvider;
-   // }
 
     @Bean
     public AuthenticationManager authManager2(HttpSecurity http) throws Exception {

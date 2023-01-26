@@ -1,4 +1,5 @@
 package ch.supsi.webapp.web.Config;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,12 +25,9 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.antMatcher("/app/**")
-                .authorizeRequests()
-                .mvcMatchers("/app/allCustomers").hasRole("MANAGER")
-                .mvcMatchers("/app/login").permitAll()
-                .mvcMatchers("/app/login2").permitAll()
-                .anyRequest().authenticated()
+        http.authorizeRequests()
+                .antMatchers("/app/login").permitAll()
+                .antMatchers("/app/**").authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/app/login")
@@ -43,7 +41,6 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-    @Bean
     public DaoAuthenticationProvider baseAuthProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(customUserDetailService);

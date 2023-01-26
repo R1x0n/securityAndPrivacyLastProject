@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CustomerRepository extends JpaRepository<Employee,Integer> {
+public interface CostumerRepository extends JpaRepository<Employee,Integer> {
     @Query(value="SELECT c.firstName AS CustomerFirstName, c.lastName AS CustomerLastName, c.email AS CustomerEmail, c.phone AS CustomerPhone FROM Customer AS c", nativeQuery = true)
     List<ICustomer> getCustomersInterface();
 

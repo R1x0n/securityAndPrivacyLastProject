@@ -25,6 +25,15 @@ USE `brigatti`;
 /*******************************************************************************
    Create Tables
 ********************************************************************************/
+
+CREATE TABLE `Logs`
+   (USER_ID INT    NOT NULL,
+    DATED   DATE           NOT NULL,
+    LOGGER  VARCHAR(50)    NOT NULL,
+    LEVEL   VARCHAR(10)    NOT NULL,
+    MESSAGE VARCHAR(1000)  NOT NULL
+   );
+
 CREATE TABLE `Album`
 (
     `AlbumId` INT NOT NULL,
