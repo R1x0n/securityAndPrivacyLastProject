@@ -6,7 +6,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ch.supsi.webapp.web.Modules.Employee;
 import ch.supsi.webapp.web.Services.ServiceUser;
 import ch.supsi.webapp.web.Utilities.UtilLogger;
 import org.springframework.beans.factory.annotation.Autowired;

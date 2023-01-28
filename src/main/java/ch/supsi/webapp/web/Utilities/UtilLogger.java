@@ -2,9 +2,6 @@ package ch.supsi.webapp.web.Utilities;
 
 import ch.supsi.webapp.web.Modules.Logs;
 import ch.supsi.webapp.web.Repositories.LogsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;

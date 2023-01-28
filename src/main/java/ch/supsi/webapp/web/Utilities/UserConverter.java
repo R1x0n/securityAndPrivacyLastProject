@@ -2,7 +2,6 @@ package ch.supsi.webapp.web.Utilities;
 
 import ch.supsi.webapp.web.Modules.Employee;
 import ch.supsi.webapp.web.Services.ServiceUser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
