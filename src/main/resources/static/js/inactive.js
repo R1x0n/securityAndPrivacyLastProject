@@ -6,7 +6,7 @@ function inactivityTime () {
     document.onkeydown = resetTimer;
 
     function logout() {
-        location.href = 'app/logout'
+        location.href = '/app/logout'
     }
 
     function resetTimer() {

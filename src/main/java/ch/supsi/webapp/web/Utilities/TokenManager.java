@@ -32,6 +32,7 @@ public class TokenManager implements Serializable {
 
         Instant now = Instant.now();
         Map<String, Object> claims = new HashMap<>();
+        UtilLogger.info("Generating token for user " + userDetails.getUsername());
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(Date.from(now))

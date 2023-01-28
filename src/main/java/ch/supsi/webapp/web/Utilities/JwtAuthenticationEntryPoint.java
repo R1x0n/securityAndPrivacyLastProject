@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.owasp.encoder.Encode;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint,
         Serializable {
@@ -16,7 +17,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint,
                          HttpServletResponse httpServletResponse,
                          AuthenticationException e) throws IOException, ServletException {
 
-        final String expired = (String) httpServletRequest.getAttribute("expired");
+        String expired = (String) httpServletRequest.getAttribute("expired");
+        expired = Encode.forHtml(expired);
         System.out.println(expired);
         if (expired!=null){
             httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,expired);

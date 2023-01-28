@@ -49,8 +49,7 @@ public class HttpUserController {
 
     @RequestMapping(value = "/api/costumers", method = RequestMethod.POST)
     public ResponseEntity<Employee> post(@RequestBody Employee user) {
-        List<ICustomer> customers = costumerRepository.getCustomersInterface();
-        serviceUser.save(user);
+        serviceUser.save((Employee) costumerRepository.getCustomersInterface());
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
@@ -58,7 +57,7 @@ public class HttpUserController {
     public Optional<Employee> getTicket(@PathVariable int id) {
         Optional<Employee> user = serviceUser.findById(id);
         if (user.isPresent()) {
-            return user;
+            return serviceUser.findById(id);
         } else {
             throw new ResponseStatusException(NOT_FOUND, "Unable to find resource");
         }
@@ -66,9 +65,8 @@ public class HttpUserController {
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
     public Optional<Employee> updateTicket(@PathVariable int id, @RequestBody Employee user) {
-        Optional<Employee> res = Optional.ofNullable(serviceUser.save(user));
-        if (res.isPresent()) {
-            return res;
+        if (Optional.ofNullable(serviceUser.save(user)).isPresent()) {
+            return Optional.ofNullable(serviceUser.save(user));
         } else {
             throw new ResponseStatusException(NOT_FOUND, "Unable to find resource");
         }
